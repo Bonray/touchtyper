@@ -9,15 +9,14 @@
           Something went wrong! Text loading failed. Please, try again later.
         </p>
         <p class="trainer__text" v-else>
-          <!-- <base-char v-for="(char, idx) in text" :key="idx" :char="char" :id="idx" :typed-letter="typedLetter" /> -->
-          <span
-            class="char"
-            :class="{ 'current--default': isCurrent, 'current--error': isCurrentWrong, 'passed--right': isCurrentCorrect }"
-            v-for="(char, idx) in text"
-            :key="idx"
-          >
-            {{ char }}
-          </span>
+          <base-char
+            v-for="(char, idx) in text" 
+            :key="idx" 
+            :char="char" 
+            :idx="idx" 
+            :typed-letter="typedLetter"
+            :current-position="currentPosition"
+          />
         </p>
         <ul class="trainer__list">
           <li class="trainer__item">
@@ -48,17 +47,20 @@
 <script>
 import BaseModal from '@/components/BaseModal.vue';
 import BaseLoader from '@/components/BaseLoader.vue';
+import BaseChar from '@/components/BaseChar.vue';
 
 export default {
-  components: { BaseModal, BaseLoader },
+  components: { BaseModal, BaseLoader, BaseChar },
   data() {
     return {
+      currentPosition: 0,
       typedLetter: null,
+      isPrevKeystrokeWrong: false,
     }
   },
   computed: {
     text() {
-      return this.$store.state.text.split('');
+      return this.$store.getters.splittedText;
     },
     isLoading() {
       return this.$store.state.isLoading;
@@ -66,24 +68,27 @@ export default {
     isLoadingFailed() {
       return this.$store.state.isLoadingFailed;
     },
-    currentPosition() {
-      return this.$store.state.currentPosition;
-    },
-    isCurrent() {
-      return this.id === this.currentPosition;
-    },
-    isCurrentWrong() {
-      return this.id === this.currentPosition && this.typedLetter && this.typedLetter !== this.char;
-    },
-    isCurrentCorrect() {
-      if (this.currentPosition < this.id) return;
-      return this.typedLetter === this.char;
-    },
   },
   methods: {
+    handleKeystroke(e) {
+      if (e.key === 'Shift' || e.key === 'CapsLock') return;
+
+      this.typedLetter = e.key;
+      const expected = this.text[this.currentPosition];
+
+      if (this.typedLetter === expected) {
+        this.currentPosition++;
+        this.typedLetter = null;
+        this.isPrevKeystrokeWrong = false;
+      } else {
+        if (!this.isPrevKeystrokeWrong) this.$store.state.mistakesCount++;
+        this.isPrevKeystrokeWrong = true;
+      }
+    }
   },
   created() {
     this.$store.dispatch('getText');
+    window.addEventListener('keydown', this.handleKeystroke);
   }
 }
 </script>

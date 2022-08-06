@@ -9,12 +9,14 @@ export default createStore({
     isLoadingFailed: false,
     error: null,
     errorMsg: '',
-    currentPosition: 0,
     mistakesCount: 0,
     wpm: 0,
     accuracy: 0,
   },
   getters: {
+    splittedText(state) {
+      return state.text.split('');
+    }
   },
   mutations: {
     updateText(state, payload) {
