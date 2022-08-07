@@ -7,10 +7,11 @@ export default createStore({
     text: null,
     isLoading: false,
     isLoadingFailed: false,
-    error: null,
+    wordCount: 0,
+    timestamp: null,
+    time: 0,
     mistakesCount: 0,
-    wpm: 0,
-    accuracy: 0,
+    results: [],
   },
 
   getters: {
@@ -19,12 +20,39 @@ export default createStore({
     },
     numberOfWords(state) {
       return state.text ? state.text.split(' ').length : 0;
-    }
+    },
+    wpm(state) {
+      return state.time ? (state.wordCount / state.time * 60).toFixed(1) : 0;
+    },
+    accuracy(state, getters) {
+      return getters.splittedText.length ? ((getters.splittedText.length - state.mistakesCount) / getters.splittedText.length * 100).toFixed(1) : 0;
+    },
   },
 
   mutations: {
     updateText(state, payload) {
       state.text = payload;
+    },
+    updateTime(state, payload) {
+      state.time = payload;
+    },
+    incrementWordCount(state) {
+      state.wordCount++;
+    },
+    incrementMistakesCount(state) {
+      state.mistakesCount++;
+    },
+    setTimestamp(state, payload) {
+      state.timestamp = payload;
+    },
+    updateResults(state, payload) {
+      state.results.push(payload);
+    },
+    resetState(state) {
+      state.mistakesCount = 0;
+      state.time = 0;
+      state.timestamp = null;
+      state.wordCount = 0;
     }
   },
 
@@ -32,11 +60,12 @@ export default createStore({
     async getText(context) {
       context.state.isLoading = true;
       context.state.isLoadingFailed = false;
+      context.commit('resetState');
       try {
         const { data } = await axios.get(API_URL, {
           params: {
             type: 'all-meat',
-            sentences: 4,
+            sentences: 1,
           }
         });
         context.commit('updateText', ...data);
@@ -46,6 +75,10 @@ export default createStore({
       } finally {
         context.state.isLoading = false;
       }
+    },
+
+    startTimer(context) {
+      context.commit('updateTime', context.state.time + 1);
     }
   },
 });

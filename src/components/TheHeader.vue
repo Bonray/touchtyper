@@ -3,12 +3,10 @@
     <div class="header__container">
       <h1 class="heading--primary">
         <img class="header__logo" src="android-chrome-512x512.png" alt="TouchTyper Logo">
-        TouchTyper</h1>
-      <div class="header__best">
-        <span>Best Result:</span>  
-        Speed: 75 WPM. Accuracy: 98%
-      </div>
-      <router-link class="btn btn--primary" :to="{ name: 'trainer' }" v-if="$route.name !== 'trainer'">Start</router-link>
+        TouchTyper
+      </h1>
+      <router-link class="btn btn--primary" :class="{ active: $route.name === 'home' }" :to="{ name: 'home' }">Home</router-link>
+      <router-link class="btn btn--primary" :class="{ active: $route.name === 'trainer' }" :to="{ name: 'trainer' }">Start Test</router-link>
     </div>
   </header>
 </template>

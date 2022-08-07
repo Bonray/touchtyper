@@ -11,7 +11,7 @@
 
       <p class="trainer__text" v-else>
         <base-char
-          v-for="(char, idx) in text" 
+          v-for="(char, idx) in splittedText" 
           :key="idx" 
           :char="char" 
           :idx="idx" 
@@ -28,7 +28,7 @@
             </svg>
             Speed
           </span>
-          <span class="trainer__item-stat"><span>0</span> WPM</span>
+          <span class="trainer__item-stat"><span>{{ wpmRounded }}</span> WPM</span>
         </li>
 
         <li class="trainer__item">
@@ -36,9 +36,9 @@
             <svg class="trainer__item-icon">
               <use xlink:href="assets/img/sprite.svg#target"></use>
             </svg>
-            Speed
+            Accuracy
           </span>
-          <span class="trainer__item-stat"><span>100</span>%</span>
+          <span class="trainer__item-stat"><span>{{ accuracy }}</span>%</span>
         </li>
       </ul>
 
@@ -60,12 +60,12 @@ export default {
       typedLetter: null,
       isPrevKeystrokeWrong: false,
       isModalOpen: false,
-      isGameLaunched: false,
-      timestamp: null,
+      isTestLaunched: false,
+      timer: null,
     }
   },
   computed: {
-    text() {
+    splittedText() {
       return this.$store.getters.splittedText;
     },
     numberOfWords() {
@@ -77,29 +77,58 @@ export default {
     isLoadingFailed() {
       return this.$store.state.isLoadingFailed;
     },
+    accuracy() {
+      return this.$store.getters.accuracy;
+    },
+    wpm() {
+      return this.$store.getters.wpm;
+    },
+    wpmRounded() {
+      return Math.round(this.wpm);
+    }
   },
   methods: {
     handleKeystroke(e) {
-      if (e.key.length > 1) return;                         // ignore non-character keys
-      if (!this.isGameLaunched) {                           // start the game
-        this.isGameLaunched = true;
-        this.timestamp = new Date().getTime();
+      // ignore non-character keys
+      if (e.key.length > 1) return;
+      
+      // start the test
+      if (!this.isTestLaunched) {
+        clearInterval(this.timer);
+        this.isTestLaunched = true;
+        this.$store.commit('setTimestamp', new Date().getTime());
+        this.timer = setInterval(() => {
+          this.$store.dispatch('startTimer');
+        }, 1000);
       }
 
-      this.typedLetter = e.key;                             // pressed key
-      const expected = this.text[this.currentPosition];     // expected key
+      this.typedLetter = e.key;
+      const expected = this.splittedText[this.currentPosition];
 
-      if (this.typedLetter === expected) {                  // if the keys match then move on to the next character
+      this.validateCharacter(expected);
+      this.checkTestFinish();
+    },
+
+    validateCharacter(character) {
+      if (this.typedLetter === character) {
+        if (this.typedLetter === ' ') this.$store.commit('incrementWordCount');
         this.currentPosition++;
         this.typedLetter = null;
         this.isPrevKeystrokeWrong = false;
-      } else {                                              // else increase the mistakes counter if the previous keystroke was not wrong
-        if (!this.isPrevKeystrokeWrong) this.$store.state.mistakesCount++;
+      } else {
+        if (!this.isPrevKeystrokeWrong) this.$store.commit('incrementMistakesCount');
         this.isPrevKeystrokeWrong = true;
       }
     },
+
     checkTestFinish() {
-      if (this.currentPosition === this.text.length - 1) {
+      if (this.currentPosition === this.splittedText.length) {
+        clearInterval(this.timer);
+        window.removeEventListener('keydown', this.handleKeystroke);
+        this.$store.commit('updateResults', {
+          wpm: this.wpm,
+          accuracy: this.accuracy,
+        });
         this.$router.push({ path: '/results' });
       }
     },
@@ -107,6 +136,6 @@ export default {
   created() {
     this.$store.dispatch('getText');
     window.addEventListener('keydown', this.handleKeystroke);
-  }
+  },
 }
 </script>
