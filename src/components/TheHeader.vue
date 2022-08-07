@@ -8,7 +8,7 @@
         <span>Best Result:</span>  
         Speed: 75 WPM. Accuracy: 98%
       </div>
-      <router-link class="btn" :to="{ name: 'trainer' }" v-if="$route.name !== 'trainer'">Start</router-link>
+      <router-link class="btn btn--primary" :to="{ name: 'trainer' }" v-if="$route.name !== 'trainer'">Start</router-link>
     </div>
   </header>
 </template>

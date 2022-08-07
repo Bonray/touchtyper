@@ -8,21 +8,26 @@ export default createStore({
     isLoading: false,
     isLoadingFailed: false,
     error: null,
-    errorMsg: '',
     mistakesCount: 0,
     wpm: 0,
     accuracy: 0,
   },
+
   getters: {
     splittedText(state) {
-      return state.text.split('');
+      return state.text ? state.text.split('') : [];
+    },
+    numberOfWords(state) {
+      return state.text ? state.text.split(' ').length : 0;
     }
   },
+
   mutations: {
     updateText(state, payload) {
       state.text = payload;
     }
   },
+
   actions: {
     async getText(context) {
       context.state.isLoading = true;
