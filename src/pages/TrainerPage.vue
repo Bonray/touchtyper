@@ -1,50 +1,54 @@
 <template>
-  <div class="trainer">
-    <div class="trainer__container">
-      <p class="trainer__text" v-if="isLoading">
-        <base-loader/>
-      </p>
+  <main class="main">
+    <div class="trainer">
+      <div class="trainer__container">
+        <p class="trainer__text" v-if="isLoading">
+          <base-loader/>
+        </p>
 
-      <p class="trainer__text" v-else-if="isLoadingFailed">
-        Something went wrong! Text loading failed. Please, try again later.
-      </p>
+        <p class="trainer__text" v-else-if="isLoadingFailed">
+          Something went wrong! Text loading failed. Please, try again later.
+        </p>
 
-      <p class="trainer__text" v-else>
-        <base-char
-          v-for="(char, idx) in splittedText" 
-          :key="idx" 
-          :char="char" 
-          :idx="idx" 
-          :typed-letter="typedLetter"
-          :current-position="currentPosition"
-        />
-      </p>
+        <p class="trainer__text" v-else>
+          <base-char
+            v-for="(char, idx) in splittedText" 
+            :key="idx" 
+            :char="char" 
+            :idx="idx" 
+            :typed-letter="typedLetter"
+            :current-position="currentPosition"
+          />
+        </p>
 
-      <ul class="trainer__list">
-        <li class="trainer__item">
-          <span class="trainer__item-head">
-            <svg class="trainer__item-icon">
-              <use xlink:href="assets/img/sprite.svg#speedometer"></use>
-            </svg>
-            Speed
-          </span>
-          <span class="trainer__item-stat"><span>{{ wpmRounded }}</span> WPM</span>
-        </li>
+        <ul class="trainer__list">
+          <li class="trainer__item">
+            <span class="trainer__item-head">
+              <svg class="trainer__item-icon">
+                <use xlink:href="assets/img/sprite.svg#speedometer"></use>
+              </svg>
+              Speed
+            </span>
+            <span class="trainer__item-stat"><span>{{ wpmRounded }}</span> WPM</span>
+          </li>
 
-        <li class="trainer__item">
-          <span class="trainer__item-head">
-            <svg class="trainer__item-icon">
-              <use xlink:href="assets/img/sprite.svg#target"></use>
-            </svg>
-            Accuracy
-          </span>
-          <span class="trainer__item-stat"><span>{{ accuracy }}</span>%</span>
-        </li>
-      </ul>
+          <li class="trainer__item">
+            <span class="trainer__item-head">
+              <svg class="trainer__item-icon">
+                <use xlink:href="assets/img/sprite.svg#target"></use>
+              </svg>
+              Accuracy
+            </span>
+            <span class="trainer__item-stat"><span>{{ accuracy }}</span>%</span>
+          </li>
+        </ul>
 
+      </div>
     </div>
-  </div>
-  <base-modal v-if="isModalOpen"/>
+    <Teleport to="body">
+      <base-modal v-if="isModalOpen" @close-modal="closeModal" />
+    </Teleport>
+  </main>
 </template>
 
 <script>
@@ -94,12 +98,10 @@ export default {
       
       // start the test
       if (!this.isTestLaunched) {
-        clearInterval(this.timer);
         this.isTestLaunched = true;
+        this.$store.commit('stopTimer');
         this.$store.commit('setTimestamp', new Date().getTime());
-        this.timer = setInterval(() => {
-          this.$store.dispatch('startTimer');
-        }, 1000);
+        this.$store.commit('startTimer');
       }
 
       this.typedLetter = e.key;
@@ -123,8 +125,8 @@ export default {
 
     checkTestFinish() {
       if (this.currentPosition === this.splittedText.length) {
-        clearInterval(this.timer);
         window.removeEventListener('keydown', this.handleKeystroke);
+        this.$store.commit('stopTimer');
         this.$store.commit('updateResults', {
           wpm: this.wpm,
           accuracy: this.accuracy,
@@ -132,10 +134,17 @@ export default {
         this.$router.push({ path: '/results' });
       }
     },
+
+    closeModal() {
+      this.isModalOpen = false;
+    }
   },
   created() {
     this.$store.dispatch('getText');
     window.addEventListener('keydown', this.handleKeystroke);
   },
+  beforeUnmount() {
+    this.$store.commit('stopTimer');
+  }
 }
 </script>

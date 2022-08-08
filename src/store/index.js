@@ -8,9 +8,10 @@ export default createStore({
     isLoading: false,
     isLoadingFailed: false,
     wordCount: 0,
-    timestamp: null,
-    time: 0,
     mistakesCount: 0,
+    timestamp: null,
+    timer: null,
+    time: 0,
     results: [],
   },
 
@@ -25,7 +26,9 @@ export default createStore({
       return state.time ? (state.wordCount / state.time * 60).toFixed(1) : 0;
     },
     accuracy(state, getters) {
-      return getters.splittedText.length ? ((getters.splittedText.length - state.mistakesCount) / getters.splittedText.length * 100).toFixed(1) : 0;
+      return getters.splittedText.length 
+        ? ((getters.splittedText.length - state.mistakesCount) / getters.splittedText.length * 100).toFixed(1) 
+        : 0;
     },
   },
 
@@ -33,8 +36,8 @@ export default createStore({
     updateText(state, payload) {
       state.text = payload;
     },
-    updateTime(state, payload) {
-      state.time = payload;
+    incrementTime(state) {
+      state.time++;
     },
     incrementWordCount(state) {
       state.wordCount++;
@@ -53,6 +56,13 @@ export default createStore({
       state.time = 0;
       state.timestamp = null;
       state.wordCount = 0;
+      state.timer = null;
+    },
+    startTimer(state) {
+      state.timer = setInterval(() => state.time++, 1000);
+    },
+    stopTimer(state) {
+      clearInterval(state.timer);
     }
   },
 
@@ -76,9 +86,5 @@ export default createStore({
         context.state.isLoading = false;
       }
     },
-
-    startTimer(context) {
-      context.commit('updateTime', context.state.time + 1);
-    }
   },
 });
