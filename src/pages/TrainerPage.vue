@@ -1,7 +1,10 @@
 <template>
   <main class="main">
     <div class="trainer">
-      <div class="trainer__container">
+      <div class="trainer__container" v-if="isMobile">
+        <h2 class="heading--secondary">Viewport width of your device is not suitable for this test.<br>Please, try other devices.</h2>
+      </div>
+      <div class="trainer__container" v-else>
         <p class="trainer__text" v-if="isLoading">
           <base-loader/>
         </p>
@@ -21,53 +24,58 @@
           />
         </p>
 
-        <ul class="trainer__list">
-          <li class="trainer__item">
-            <span class="trainer__item-head">
-              <svg class="trainer__item-icon">
-                <use xlink:href="assets/img/sprite.svg#speedometer"></use>
-              </svg>
-              Speed
-            </span>
-            <span class="trainer__item-stat"><span>{{ wpmRounded }}</span> WPM</span>
-          </li>
+        <div class="trainer__info">
+          <ul class="trainer__list">
+            <li class="trainer__item">
+              <span class="trainer__item-head">
+                <svg class="trainer__item-icon">
+                  <use xlink:href="assets/img/sprite.svg#speedometer"></use>
+                </svg>
+                Speed
+              </span>
+              <span class="trainer__item-stat"><span>{{ wpmRounded }}</span> WPM</span>
+            </li>
 
-          <li class="trainer__item">
-            <span class="trainer__item-head">
-              <svg class="trainer__item-icon">
-                <use xlink:href="assets/img/sprite.svg#target"></use>
-              </svg>
-              Accuracy
-            </span>
-            <span class="trainer__item-stat"><span>{{ accuracy }}</span>%</span>
-          </li>
-        </ul>
+            <li class="trainer__item">
+              <span class="trainer__item-head">
+                <svg class="trainer__item-icon">
+                  <use xlink:href="assets/img/sprite.svg#target"></use>
+                </svg>
+                Accuracy
+              </span>
+              <span class="trainer__item-stat"><span>{{ accuracy }}</span>%</span>
+            </li>
+          </ul>
 
+          <button class="trainer__btn" @click.prevent="$router.go()">
+            <svg class="trainer__btn-icon">
+              <use xlink:href="assets/img/sprite.svg#restart"></use>
+            </svg>
+            Restart
+          </button>
+        </div>
       </div>
     </div>
-    <Teleport to="body">
-      <base-modal v-if="isModalOpen" @close-modal="closeModal" />
-    </Teleport>
   </main>
 </template>
 
 <script>
-import BaseModal from '@/components/BaseModal.vue';
 import BaseLoader from '@/components/BaseLoader.vue';
 import BaseChar from '@/components/BaseChar.vue';
 
 export default {
-  components: { BaseModal, BaseLoader, BaseChar },
+  components: { BaseLoader, BaseChar },
   data() {
     return {
       currentPosition: 0,
       typedLetter: null,
       isPrevKeystrokeWrong: false,
-      isModalOpen: false,
       isTestLaunched: false,
       timer: null,
+      isMobile: false,
     }
   },
+  
   computed: {
     splittedText() {
       return this.$store.getters.splittedText;
@@ -91,6 +99,7 @@ export default {
       return Math.round(this.wpm);
     }
   },
+
   methods: {
     handleKeystroke(e) {
       // ignore non-character keys
@@ -99,14 +108,13 @@ export default {
       // start the test
       if (!this.isTestLaunched) {
         this.isTestLaunched = true;
-        this.$store.commit('stopTimer');
         this.$store.commit('setTimestamp', new Date().getTime());
-        this.$store.commit('startTimer');
+        clearInterval(this.timer);
+        this.timer = setInterval(() => this.$store.commit('incrementTime'), 1000);
       }
 
       this.typedLetter = e.key;
       const expected = this.splittedText[this.currentPosition];
-
       this.validateCharacter(expected);
       this.checkTestFinish();
     },
@@ -126,7 +134,7 @@ export default {
     checkTestFinish() {
       if (this.currentPosition === this.splittedText.length) {
         window.removeEventListener('keydown', this.handleKeystroke);
-        this.$store.commit('stopTimer');
+        clearInterval(this.timer);
         this.$store.commit('updateResults', {
           wpm: this.wpm,
           accuracy: this.accuracy,
@@ -134,17 +142,24 @@ export default {
         this.$router.push({ path: '/results' });
       }
     },
-
-    closeModal() {
-      this.isModalOpen = false;
-    }
+    
+    handleViewportWidth() {
+      if (window.innerWidth > 900) this.isMobile = false;
+      else this.isMobile = true;
+    },
   },
+
   created() {
     this.$store.dispatch('getText');
     window.addEventListener('keydown', this.handleKeystroke);
+    ['load', 'resize'].forEach((event) => window.addEventListener(event, this.handleViewportWidth));
   },
+  
   beforeUnmount() {
-    this.$store.commit('stopTimer');
+    clearInterval(this.timer);
+    this.timer = null;
+    window.removeEventListener('keydown', this.handleKeystroke);
+    ['load', 'resize'].forEach((event) => window.removeEventListener(event, this.handleViewportWidth));
   }
 }
 </script>

@@ -10,7 +10,6 @@ export default createStore({
     wordCount: 0,
     mistakesCount: 0,
     timestamp: null,
-    timer: null,
     time: 0,
     results: [],
   },
@@ -56,14 +55,7 @@ export default createStore({
       state.time = 0;
       state.timestamp = null;
       state.wordCount = 0;
-      state.timer = null;
     },
-    startTimer(state) {
-      state.timer = setInterval(() => state.time++, 1000);
-    },
-    stopTimer(state) {
-      clearInterval(state.timer);
-    }
   },
 
   actions: {
