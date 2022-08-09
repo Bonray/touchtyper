@@ -67,13 +67,12 @@ export default createStore({
         const { data } = await axios.get(API_URL, {
           params: {
             type: 'all-meat',
-            sentences: 1,
+            sentences: 2,
           }
         });
         context.commit('updateText', ...data);
-      } catch(err) {
+      } catch {
         context.state.isLoadingFailed = true;
-        context.state.error = err;
       } finally {
         context.state.isLoading = false;
       }

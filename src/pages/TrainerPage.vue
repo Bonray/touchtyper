@@ -4,6 +4,7 @@
       <div class="trainer__container" v-if="isMobile">
         <h2 class="heading--secondary">Viewport width of your device is not suitable for this test.<br>Please, try other devices.</h2>
       </div>
+      
       <div class="trainer__container" v-else>
         <p class="trainer__text" v-if="isLoading">
           <base-loader/>
@@ -113,6 +114,7 @@ export default {
         this.timer = setInterval(() => this.$store.commit('incrementTime'), 1000);
       }
 
+      // validate the typed charachter and check if the test ended
       this.typedLetter = e.key;
       const expected = this.splittedText[this.currentPosition];
       this.validateCharacter(expected);
