@@ -6,7 +6,7 @@
         <ul class="results__list">
           <li class="results__item results__item--typing">
             <svg class="results__item-icon">
-              <use xlink:href="assets/img/sprite.svg#speedometer-2"></use>
+              <use xlink:href="@/assets/img/sprite.svg#speedometer-2"></use>
             </svg>
             <h3 class="results__item-heading">Typing speed:</h3>
             <p class="results__item-stat">
@@ -16,7 +16,7 @@
 
           <li class="results__item results__item--accuracy">
             <svg class="results__item-icon">
-              <use xlink:href="assets/img/sprite.svg#target-2"></use>
+              <use xlink:href="@/assets/img/sprite.svg#target-2"></use>
             </svg>
             <h3 class="results__item-heading">Accuracy:</h3>
             <p class="results__item-stat">
