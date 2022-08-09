@@ -30,7 +30,7 @@
             <li class="trainer__item">
               <span class="trainer__item-head">
                 <svg class="trainer__item-icon">
-                  <use xlink:href="assets/img/sprite.svg#speedometer"></use>
+                  <use xlink:href="@/assets/img/sprite.svg#speedometer"></use>
                 </svg>
                 Speed
               </span>
@@ -40,7 +40,7 @@
             <li class="trainer__item">
               <span class="trainer__item-head">
                 <svg class="trainer__item-icon">
-                  <use xlink:href="assets/img/sprite.svg#target"></use>
+                  <use xlink:href="@/assets/img/sprite.svg#target"></use>
                 </svg>
                 Accuracy
               </span>
@@ -50,7 +50,7 @@
 
           <button class="trainer__btn" @click.prevent="$router.go()">
             <svg class="trainer__btn-icon">
-              <use xlink:href="assets/img/sprite.svg#restart"></use>
+              <use xlink:href="@/assets/img/sprite.svg#restart"></use>
             </svg>
             Restart
           </button>

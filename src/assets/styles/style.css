@@ -24,6 +24,7 @@
 
 /* GENERAL */
 body {
+  margin: 0;
   font-family: 'Montserrat', sans-serif;
   background-color: #55c5ff;
 }
@@ -32,6 +33,10 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+.main {
+  display: block;
 }
 
 .heading--primary {
@@ -151,10 +156,6 @@ body {
 .btn--secondary:active {
   transform: translateY(0);
   box-shadow: 0 1px 8px #2c93d4;
-}
-
-.hidden {
-  display: none;
 }
 
 .current--default,

@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
+    "vue-svg-sprite-loader": "^1.2.1",
     "vuex": "^4.0.0"
   },
   "devDependencies": {
@@ -25,7 +26,9 @@
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "postcss": "^8.4.16",
-    "postcss-loader": "^7.0.1"
+    "postcss-loader": "^7.0.1",
+    "vue-svg-loader": "^0.16.0",
+    "vue-template-compiler": "^2.7.8"
   },
   "eslintConfig": {
     "root": true,
