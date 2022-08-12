@@ -133,6 +133,7 @@ body {
 .btn--primary.active {
   background-color: #27a2e8;
   background-image: none;
+  pointer-events: none;
 }
 
 .btn--secondary {
@@ -190,7 +191,7 @@ body {
 /* HOME */
 .home__container {
   padding: 110px 0 110px 400px;
-  background: url(../img/boy.png) no-repeat center left;
+  background: url('../img/boy.png') no-repeat center left;
   background-size: 320px 450px;
 }
 
@@ -507,6 +508,10 @@ body {
 }
 
 @media (max-width: 720px) {
+  .footer {
+    position: static;
+  }
+  
   .header__best {
     display: none;
   }

@@ -110,6 +110,7 @@ export default {
       if (!this.isTestLaunched) {
         this.isTestLaunched = true;
         this.$store.commit('setTimestamp', new Date().getTime());
+        this.$store.commit('incrementWordCount');
         clearInterval(this.timer);
         this.timer = setInterval(() => this.$store.commit('incrementTime'), 1000);
       }
@@ -135,7 +136,6 @@ export default {
 
     checkTestFinish() {
       if (this.currentPosition === this.splittedText.length) {
-        window.removeEventListener('keydown', this.handleKeystroke);
         clearInterval(this.timer);
         this.$store.commit('updateResults', {
           wpm: this.wpm,
