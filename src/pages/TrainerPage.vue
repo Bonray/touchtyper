@@ -48,7 +48,7 @@
             </li>
           </ul>
 
-          <button class="trainer__btn" @click.prevent="$router.go()">
+          <button class="trainer__btn" @click="$router.go()">
             <svg class="trainer__btn-icon">
               <use xlink:href="@/assets/img/sprite.svg#restart"></use>
             </svg>
@@ -106,7 +106,17 @@ export default {
       // ignore non-character keys
       if (e.key.length > 1) return;
       
-      // start the test
+      // check if the test has already started
+      this.checkTestStart(); 
+
+      // validate the typed charachter and check if the test ended
+      this.typedLetter = e.key;
+      const expected = this.splittedText[this.currentPosition];
+      this.validateCharacter(expected);
+      this.checkTestFinish();
+    },
+
+    checkTestStart() {
       if (!this.isTestLaunched) {
         this.isTestLaunched = true;
         this.$store.commit('setTimestamp', new Date().getTime());
@@ -114,12 +124,6 @@ export default {
         clearInterval(this.timer);
         this.timer = setInterval(() => this.$store.commit('incrementTime'), 1000);
       }
-
-      // validate the typed charachter and check if the test ended
-      this.typedLetter = e.key;
-      const expected = this.splittedText[this.currentPosition];
-      this.validateCharacter(expected);
-      this.checkTestFinish();
     },
 
     validateCharacter(character) {
