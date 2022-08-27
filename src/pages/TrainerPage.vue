@@ -150,15 +150,14 @@ export default {
     },
     
     handleViewportWidth() {
-      if (window.innerWidth > 900) this.isMobile = false;
-      else this.isMobile = true;
+      this.isMobile = window.innerWidth > 900 ? false : true;
     },
   },
 
-  created() {
-    this.$store.dispatch('getText');
-    window.addEventListener('keydown', this.handleKeystroke);
+  async created() {
     ['load', 'resize'].forEach((event) => window.addEventListener(event, this.handleViewportWidth));
+    await this.$store.dispatch('getText');
+    window.addEventListener('keydown', this.handleKeystroke);
   },
   
   beforeUnmount() {
