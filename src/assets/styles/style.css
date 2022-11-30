@@ -459,6 +459,10 @@ body {
     max-width: 700px;
   }
 
+  .footer {
+    position: static;
+  }
+
   .heading--primary {
     margin: 0;
   }
@@ -506,10 +510,6 @@ body {
 }
 
 @media (max-width: 720px) {
-  .footer {
-    position: static;
-  }
-  
   .header__best {
     display: none;
   }
